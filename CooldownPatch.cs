@@ -43,8 +43,6 @@ namespace IAmSilK.ReputationCooldowns
 
         public static double GetCooldown(RocketCommandManager manager, IRocketPlayer player, IRocketCommand command, int reputation)
         {
-            float multiplier = ReputationCooldowns.Instance.GetCooldownMultiplier(reputation);
-            
             IList cooldown = (IList)CooldownField.GetValue(manager);
 
             object rocketCommandCooldown = null;
@@ -71,7 +69,12 @@ namespace IAmSilK.ReputationCooldowns
 
             double totalSeconds = (DateTime.Now - commandRequested).TotalSeconds;
 
-            double trueCooldown = applyingPermission.Cooldown * multiplier;
+            double trueCooldown = applyingPermission.Cooldown;
+
+            if (!player.HasPermission("repcooldown.exempt"))
+            {
+                trueCooldown *= ReputationCooldowns.Instance.GetCooldownMultiplier(reputation);
+            }
 
             if (trueCooldown <= totalSeconds)
             {
